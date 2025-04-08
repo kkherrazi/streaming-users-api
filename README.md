@@ -1,6 +1,6 @@
-# Déployment de microservicesavec Kubernetes
-Déployment de microservices sur un cluster Kuberneteses, 2 microservices à déployer :
-- un service qui déploiera l'application _streaming_fastapi_ 
+# Déploiement de microservices avec avec Kubernetes
+Déploiement de deux microservices sur un cluster Kubernetes. Ci-dessous les 2 microservices à déployer :
+- un service qui déploie l'application _streaming_fastapi_ 
 - un second service qui déploie la base de données PostgreSQL
  
 ## Creation de l'image de l'application FastAPI  
@@ -18,7 +18,8 @@ docker tag streaming_fastapi_image:latest localhost:5000/streaming_fastapi_image
 docker push localhost:5000/streaming_fastapi_image:1.0
 ````
  
-## Create des objets Kubernetes
+## Creation des objets Kubernetes
+
 
 ***Secrets*** pour passer les éléments de configurations sensibles 
 ````sh 
