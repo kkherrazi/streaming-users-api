@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: postgres-deployment
+  labels:
+    app: postgres
+spec:
+  serviceName: postgres
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postgres
+  template:
+    metadata:
+      labels:
+        app: postgres
+    spec:
+      containers:
+        - image: docker.io/postgres:12.0-alpine
+          name: postgres  
+          envFrom:
+#            - secretRef:
+ #               name: postgres-user-credentials
+            - configMapRef:
+                name: postgres-configmap   
+          ports:
+            - containerPort: 5432
+ 
+          volumeMounts:
+            - mountPath: /var/lib/postgresql/data
+              name: postgres-volume
+      volumes:
+        - name: postgres-volume  
+          persistentVolumeClaim:
+            claimName: postgres-persistent-volume-claim 
+
+
+--- 
+apiVersion: v1
+kind: Service
+metadata:
+  name: db
+spec:
+  selector:
+    app: postgres
+  ports:
+    - protocol: TCP
+      port: 5432
