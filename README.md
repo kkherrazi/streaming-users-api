@@ -1,37 +1,65 @@
-# streaming-users-api
+# Déployment de microservicesavec Kubernetes
+Déployment de microservices sur un cluster Kuberneteses, 2 microservices à déployer :
+- un service qui déploiera l'application _streaming_fastapi_ 
+- un second service qui déploie la base de données PostgreSQL
  
-
-## creation d'un registry local 
+## Creation de l'image de l'application FastAPI  
+Creation d'un regisry Docker local :
 ````sh 
 docker run -itd -p 5000:5000 --name kkh-registry registry
 ````
-## creation et  publication de de l'image de l'application FastAPI 
+Build de l'image Docker:
 ````sh 
 docker build .-t streaming_fastapi_image:1.0
+````
+Tag et publication d'une version de l'image dans le registry local afin de pouvoir l'utiliser avec ***kubectl***:
+````sh 
 docker tag streaming_fastapi_image:latest localhost:5000/streaming_fastapi_image:1.0
 docker push localhost:5000/streaming_fastapi_image:1.0
 ````
  
-## create  
+## Create des objets Kubernetes
+
+***Secrets*** pour passer les éléments de configurations sensibles 
 ````sh 
 kubectl apply -f YAML-STANDAR/secret.yaml
+````
+***ConfigMap*** pour tout type d'information non-sensible
+````sh 
 kubectl apply -f YAML-STANDAR/configmap.yaml
+````
+***Persistant Volum Claim*** qui utilise la classe de stockage par défaut de Rancher (StorageClass) 
+````sh 
 kubectl apply -f YAML-STANDAR/pvc.yaml
+````
+***Statefulset*** Deployment  pour la base de données
+````sh 
 kubectl apply -f YAML-STANDAR/postgres-statefulset.yaml 
+````
+***Service*** pour exposer le Pode le la base de donnés
+````sh 
 kubectl apply -f YAML-STANDAR/postgres-service.yaml 
-
+````
+***Deployment*** de l'application FastAPI
+````sh 
 kubectl apply -f YAML-STANDAR/node-deployment.yaml
+````
+***Service*** pour exposer les Podes le l'API.
+````sh 
 kubectl apply -f YAML-STANDAR/node-service.yaml
+````
+***Ingress*** pour lier le micro service FastAP au nom de domaine public. 
+````sh 
 kubectl apply -f YAML-STANDAR/ingress.yaml
 ````
 ## Interogation de l'API 
 
 ![alt text](api-screen-1.png)
 
-### Insertion de nouveaux utilisateurs
+Insertion de nouveaux utilisateurs
 ````sh 
 curl -X 'POST' -i \
-  'http://localhost:5000/' \
+  'http://app2.kkherrazi.ip-ddns.com/' \
   -H 'Content-Type: application/json' \
   -d '{  
     "name": "khalid",
@@ -39,20 +67,19 @@ curl -X 'POST' -i \
     "password": "unpassword"
 }'
 ````
-### Le nombre des utilisateurs
+Consulter le nombre des utilisateurs
 ````sh 
 echo "USERS COUNT : "
-curl -X 'GET' -i 'http://localhost:5000/users/count' -H 'Content-Type: application/json'  
+curl -X 'GET' -i 'http://app2.kkherrazi.ip-ddns.com/users/count' -H 'Content-Type: application/json'  
 ```` 
 
-# Sauvegarde de la base de donnée Postgres
-Creation d'une sauvegarde dans le Volume Persisitant 
+# Backup Postgres
+Création d'une sauvegarde de la base de données Postgres au niveau du **Volume Persisitant** 
 ````sh 
 kubectl exec postgres-deployment-0 -- pg_dump -U admin -d storedb -f /var/lib/postgresql/data/BACKUP_storedb.sql
 ````
 
-# Logs des différents Pods
-
+# Logs 
 Affichage de la liste des Pods en cours d'execution :
 ````sh 
 ubuntu@ip-172-31-46-126:~/myprojects/streaming-users-api$ kubectl get pods
@@ -126,7 +153,7 @@ PostgreSQL init process complete; ready for start up.
 2025-04-08 02:04:33.373 UTC [1] LOG:  database system is ready to accept connections
 ````
 
-Consultation des logs des pods:
+Consultation des logs des 3 Pods de l'API:
 ````sh 
 ubuntu@ip-172-31-46-126:~/myprojects/streaming-users-api$ kubectl logs fastapi-deployment-69b4b65499-2fw4p
 INFO:     Started server process [1]
