@@ -1,4 +1,4 @@
-# Déploiement de microservices avec avec Kubernetes
+# Déploiement de microservices avec Kubernetes
 Déploiement de deux microservices sur un cluster Kubernetes. Ci-dessous les 2 microservices à déployer :
 - un service qui déploie l'application _streaming_fastapi_ 
 - un second service qui déploie la base de données PostgreSQL
@@ -64,7 +64,7 @@ curl -X 'POST' -i \
   -H 'Content-Type: application/json' \
   -d '{  
     "name": "khalid",
-    "email": "khalid@kherrazi@gmail.com",
+    "email": "khalid@kherrazi.com",
     "password": "unpassword"
 }'
 ````
@@ -83,7 +83,7 @@ kubectl exec postgres-deployment-0 -- pg_dump -U admin -d storedb -f /var/lib/po
 # Logs 
 Affichage de la liste des Pods en cours d'execution :
 ````sh 
-ubuntu@ip-172-31-46-126:~/myprojects/streaming-users-api$ kubectl get pods
+$ kubectl get pods
 NAME                                  READY   STATUS    RESTARTS        AGE
 curl                                  1/1     Running   1 (3h27m ago)   3h36m
 fastapi-deployment-69b4b65499-2fw4p   1/1     Running   2 (37s ago)     42s
@@ -94,7 +94,7 @@ postgres-deployment-0                 1/1     Running   0               42s
 
 Consultation des logs du StatfulSet:
 ````sh 
-ubuntu@ip-172-31-46-126:~/myprojects/streaming-users-api$ kubectl logs postgres-deployment-0 
+$ kubectl logs postgres-deployment-0 
 The files belonging to this database system will be owned by user "postgres".
 This user must also own the server process.
 
@@ -156,17 +156,17 @@ PostgreSQL init process complete; ready for start up.
 
 Consultation des logs des 3 Pods de l'API:
 ````sh 
-ubuntu@ip-172-31-46-126:~/myprojects/streaming-users-api$ kubectl logs fastapi-deployment-69b4b65499-2fw4p
+$ kubectl logs fastapi-deployment-69b4b65499-2fw4p
 INFO:     Started server process [1]
 INFO:     Waiting for application startup.
 INFO:     Application startup complete.
 INFO:     Uvicorn running on http://0.0.0.0:5000 (Press CTRL+C to quit)
-ubuntu@ip-172-31-46-126:~/myprojects/streaming-users-api$ kubectl logs fastapi-deployment-69b4b65499-2lz8w
+$ kubectl logs fastapi-deployment-69b4b65499-2lz8w
 INFO:     Started server process [1]
 INFO:     Waiting for application startup.
 INFO:     Application startup complete.
 INFO:     Uvicorn running on http://0.0.0.0:5000 (Press CTRL+C to quit)
-ubuntu@ip-172-31-46-126:~/myprojects/streaming-users-api$ kubectl logs fastapi-deployment-69b4b65499-xdnsw
+$ kubectl logs fastapi-deployment-69b4b65499-xdnsw
 INFO:     Started server process [1]
 INFO:     Waiting for application startup.
 INFO:     Application startup complete.
